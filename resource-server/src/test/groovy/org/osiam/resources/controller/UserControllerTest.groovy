@@ -25,30 +25,25 @@ package org.osiam.resources.controller
 
 import org.osiam.resources.helper.AttributesRemovalHelper
 import org.osiam.resources.helper.JsonInputValidator
-import org.osiam.resources.provisioning.SCIMUserProvisioning
 import org.osiam.resources.helper.RequestParamHelper
-import org.osiam.resources.scim.SCIMSearchResult
-import org.springframework.http.HttpStatus
-import org.springframework.security.core.Authentication;
-import org.springframework.security.oauth2.provider.OAuth2Authentication;
-import org.springframework.security.oauth2.provider.token.InMemoryTokenStore;
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestMethod
-import org.springframework.web.bind.annotation.ResponseBody
-import org.springframework.web.bind.annotation.ResponseStatus
+import org.osiam.resources.provisioning.SCIMUserProvisioning
 import org.osiam.resources.scim.Meta
 import org.osiam.resources.scim.Name
+import org.osiam.resources.scim.SCIMSearchResult
 import org.osiam.resources.scim.User
 import org.osiam.storage.entities.EmailEntity
 import org.osiam.storage.entities.MetaEntity
 import org.osiam.storage.entities.NameEntity
 import org.osiam.storage.entities.UserEntity
-
+import org.springframework.http.HttpStatus
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestMethod
+import org.springframework.web.bind.annotation.ResponseBody
+import org.springframework.web.bind.annotation.ResponseStatus
 import spock.lang.Specification
 
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
-
 import java.lang.reflect.Method
 
 class UserControllerTest extends Specification {
@@ -62,7 +57,7 @@ class UserControllerTest extends Specification {
     def httpServletRequest = Mock(HttpServletRequest)
     def httpServletResponse = Mock(HttpServletResponse)
 
-    User user = new User.Builder("test").setActive(true)
+    def user = new User.Builder("test").setActive(true)
             .setDisplayName("display")
             .setLocale("locale")
             .setName(new Name.Builder().build())
@@ -88,11 +83,29 @@ class UserControllerTest extends Specification {
     }
 
     def "should return a cloned user based on a user found by provisioning on getUser"() {
+        given:
+        def user = new User.Builder("test").setActive(true)
+                .setDisplayName("display")
+                .setLocale("locale")
+                .setName(new Name.Builder().build())
+                .setNickName("nickname")
+                .setPassword("password")
+                .setPreferredLanguage("prefereedLanguage")
+                .setProfileUrl("profileUrl")
+                .setTimezone("time")
+                .setTitle("title")
+                .setUserType("userType")
+                .setExternalId("externalid")
+                .setId("id")
+                .setMeta(new Meta.Builder().setLocation("userURI").build())
+                .build()
+
         when:
         def result = underTest.getUser("one")
+
         then:
         1 * provisioning.getById("one") >> user
-        validateUser(result)
+        validateUser(result, user)
     }
 
     def "should contain a method to GET a user"(){
@@ -167,9 +180,8 @@ class UserControllerTest extends Specification {
         defaultStatus.value() == HttpStatus.OK
     }
 
-    def validateUser(User result) {
+    def validateUser(User result, User user) {
         assert result != user
-        assert user.password != null
         assert result.password == null
         assert result.active == user.active
         assert result.addresses.empty
@@ -193,23 +205,25 @@ class UserControllerTest extends Specification {
         assert result.userName == user.userName
         assert result.id == user.id
         assert result.externalId == user.externalId
-        assert result.meta.equals(user.meta)
+        assert result.meta.created.equals(user.meta.created)
+        assert result.meta.lastModified.equals(user.meta.lastModified)
+        assert result.meta.location != null
         true
     }
 
     def "should create the user and add the location header"() {
         given:
-        httpServletRequest.getRequestURL() >> new StringBuffer("http://host:port/deployment/User")
         def uri = new URI("http://host:port/deployment/User/id")
-        jsonInputValidator.validateJsonUser(httpServletRequest) >> user
 
         when:
         def result = underTest.create(httpServletRequest, httpServletResponse)
 
         then:
+        1 * httpServletRequest.getRequestURL() >> new StringBuffer("http://host:port/deployment/User")
+        1 * jsonInputValidator.validateJsonUser(httpServletRequest) >> user
         1 * provisioning.create(user) >> user
         1 * httpServletResponse.setHeader("Location", uri.toASCIIString())
-        validateUser(result)
+        validateUser(result, user)
     }
 
     def "should replace an user and set location header"() {
@@ -224,7 +238,7 @@ class UserControllerTest extends Specification {
         1 * provisioning.replace(id, user) >> user
         1 * httpServletRequest.getRequestURL() >> new StringBuffer("http://localhorst/horst/"+id)
         1 * httpServletResponse.setHeader("Location", "http://localhorst/horst/"+id)
-        validateUser(result)
+        validateUser(result, user)
     }
 
     def "should update an user and set location header"() {
@@ -239,7 +253,7 @@ class UserControllerTest extends Specification {
         1 * provisioning.update(id, user) >> user
         1 * httpServletRequest.getRequestURL() >> new StringBuffer("http://localhorst/horst/yo")
         1 * httpServletResponse.setHeader("Location", "http://localhorst/horst/yo")
-        validateUser(result)
+        validateUser(result, user)
     }
 
     def "should be able to search a user on /User URI with GET method" () {
