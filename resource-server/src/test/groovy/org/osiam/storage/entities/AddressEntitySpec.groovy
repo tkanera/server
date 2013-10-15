@@ -24,6 +24,7 @@
 package org.osiam.storage.entities
 
 import org.osiam.resources.scim.Address
+import org.osiam.resources.type.AddressType;
 import org.osiam.storage.entities.AddressEntity
 import org.osiam.storage.entities.UserEntity
 import spock.lang.Specification
@@ -98,10 +99,10 @@ class AddressEntitySpec extends Specification {
 
     def "setter and getter for the type should be present"() {
         when:
-        addressEntity.setType("home")
+        addressEntity.setType(AddressType.HOME)
 
         then:
-        addressEntity.getType() == "home"
+        addressEntity.getType() == AddressType.HOME
     }
 
     def "getter for the type should not throw exception if type is null"() {
@@ -110,14 +111,6 @@ class AddressEntitySpec extends Specification {
 
         then:
         addressEntity.getType() == null
-    }
-
-    def "setter and getter for primary should be present"() {
-        when:
-        addressEntity.setPrimary(true)
-
-        then:
-        addressEntity.isPrimary()
     }
 
     def "setter and getter for the user should be present"() {
@@ -149,7 +142,7 @@ class AddressEntitySpec extends Specification {
                 setLocality("locality").
                 setPostalCode("123456").
                 setRegion("region").
-                setStreetAddress("streetAddress").setPrimary(true).
+                setStreetAddress("streetAddress").
                 build()
         when:
         def result = AddressEntity.fromScim(address)
@@ -158,20 +151,4 @@ class AddressEntitySpec extends Specification {
         result != null
     }
 
-    def "should set primary to false when null"() {
-        given:
-        Address address =new Address.Builder().
-                setCountry("country").
-                setFormatted("formatted").
-                setLocality("locality").
-                setPostalCode("123456").
-                setRegion("region").
-                setStreetAddress("streetAddress").
-                build()
-        when:
-        def result = AddressEntity.fromScim(address)
-
-        then:
-        !result.isPrimary()
-    }
 }

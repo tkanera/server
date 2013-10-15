@@ -23,9 +23,8 @@
 
 package org.osiam.storage.entities
 
-import org.osiam.storage.entities.RolesEntity
-import org.springframework.security.core.GrantedAuthority
-import org.osiam.resources.scim.MultiValuedAttribute
+import org.osiam.resources.scim.Role;
+
 import spock.lang.Specification
 
 /**
@@ -57,7 +56,7 @@ class RolesEntitySpec extends Specification {
 
     def "mapping from scim should be present"() {
         given:
-        MultiValuedAttribute attribute = new MultiValuedAttribute.Builder().
+        Role attribute = new Role.Builder().
                 setValue("blaaaa").
                 build()
 

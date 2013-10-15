@@ -23,13 +23,31 @@
 
 package org.osiam.storage.entities;
 
-import org.osiam.resources.scim.Address;
-import org.osiam.resources.scim.MultiValuedAttribute;
-import org.osiam.resources.scim.Name;
-import org.osiam.resources.scim.User;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
-import javax.persistence.*;
-import java.util.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+
+import org.osiam.resources.scim.Address;
+import org.osiam.resources.scim.Email;
+import org.osiam.resources.scim.Entitlement;
+import org.osiam.resources.scim.GroupRef;
+import org.osiam.resources.scim.Ims;
+import org.osiam.resources.scim.Name;
+import org.osiam.resources.scim.PhoneNumber;
+import org.osiam.resources.scim.Photo;
+import org.osiam.resources.scim.Role;
+import org.osiam.resources.scim.User;
+import org.osiam.resources.scim.X509Certificate;
 
 /**
  * User Entity
@@ -152,41 +170,41 @@ public class UserEntity extends InternalIdSkeleton {
         return userEntity;
     }
 
-    private static Set<X509CertificateEntity> scimCertificatesToEntity(List<MultiValuedAttribute> x509Certificates) {
+    private static Set<X509CertificateEntity> scimCertificatesToEntity(List<X509Certificate> x509Certificates) {
         Set<X509CertificateEntity> x509CertificateEntities = new HashSet<>();
         if (x509Certificates != null) {
-            for (MultiValuedAttribute multiValuedAttribute : x509Certificates) {
-                x509CertificateEntities.add(X509CertificateEntity.fromScim(multiValuedAttribute));
+            for (X509Certificate actX509Certificate : x509Certificates) {
+                x509CertificateEntities.add(X509CertificateEntity.fromScim(actX509Certificate));
             }
         }
         return x509CertificateEntities;
     }
 
-    private static Set<RolesEntity> scimUserRolesToEntity(List<MultiValuedAttribute> roles) {
+    private static Set<RolesEntity> scimUserRolesToEntity(List<Role> roles) {
         Set<RolesEntity> rolesEntities = new HashSet<>();
         if (roles != null) {
-            for (MultiValuedAttribute multiValuedAttribute : roles) {
-                rolesEntities.add(RolesEntity.fromScim(multiValuedAttribute));
+            for (Role actRole : roles) {
+                rolesEntities.add(RolesEntity.fromScim(actRole));
             }
         }
         return rolesEntities;
     }
 
-    private static Set<PhotoEntity> scimPhotosToEntity(List<MultiValuedAttribute> photos) {
+    private static Set<PhotoEntity> scimPhotosToEntity(List<Photo> photos) {
         Set<PhotoEntity> photoEntities = new HashSet<>();
         if (photos != null) {
-            for (MultiValuedAttribute multiValuedAttribute : photos) {
-                photoEntities.add(PhotoEntity.fromScim(multiValuedAttribute));
+            for (Photo actPhoto : photos) {
+                photoEntities.add(PhotoEntity.fromScim(actPhoto));
             }
         }
         return photoEntities;
     }
 
-    private static Set<PhoneNumberEntity> scimPhonenumbersToEntity(List<MultiValuedAttribute> phoneNumbers) {
+    private static Set<PhoneNumberEntity> scimPhonenumbersToEntity(List<PhoneNumber> phoneNumbers) {
         Set<PhoneNumberEntity> phoneNumberEntities = new HashSet<>();
         if (phoneNumbers != null) {
-            for (MultiValuedAttribute multiValuedAttribute : phoneNumbers) {
-                phoneNumberEntities.add(PhoneNumberEntity.fromScim(multiValuedAttribute));
+            for (PhoneNumber actPhoneNumber : phoneNumbers) {
+                phoneNumberEntities.add(PhoneNumberEntity.fromScim(actPhoneNumber));
             }
         }
         return phoneNumberEntities;
@@ -196,21 +214,21 @@ public class UserEntity extends InternalIdSkeleton {
         return NameEntity.fromScim(name);
     }
 
-    private static Set<ImEntity> scimImsToEntity(List<MultiValuedAttribute> ims) {
+    private static Set<ImEntity> scimImsToEntity(List<Ims> ims) {
         Set<ImEntity> imEntities = new HashSet<>();
         if (ims != null) {
-            for (MultiValuedAttribute multiValuedAttribute : ims) {
-                imEntities.add(ImEntity.fromScim(multiValuedAttribute));
+            for (Ims actIms : ims) {
+                imEntities.add(ImEntity.fromScim(actIms));
             }
         }
         return imEntities;
     }
 
-    private static Set<EntitlementsEntity> scimEntitlementsToEntity(List<MultiValuedAttribute> entitlements) {
+    private static Set<EntitlementsEntity> scimEntitlementsToEntity(List<Entitlement> entitlements) {
         Set<EntitlementsEntity> entitlementsEntities = new HashSet<>();
         if (entitlements != null) {
-            for (MultiValuedAttribute multiValuedAttribute : entitlements) {
-                entitlementsEntities.add(EntitlementsEntity.fromScim(multiValuedAttribute));
+            for (Entitlement actEntitlement : entitlements) {
+                entitlementsEntities.add(EntitlementsEntity.fromScim(actEntitlement));
             }
         }
         return entitlementsEntities;
@@ -227,11 +245,11 @@ public class UserEntity extends InternalIdSkeleton {
         return addressEntities;
     }
 
-    private static Set<EmailEntity> scimEmailsToEntity(List<MultiValuedAttribute> emails) {
+    private static Set<EmailEntity> scimEmailsToEntity(List<Email> emails) {
         Set<EmailEntity> emailEntities = new HashSet<>();
         if (emails != null) {
-            for (MultiValuedAttribute multiValuedAttribute : emails) {
-                emailEntities.add(EmailEntity.fromScim(multiValuedAttribute));
+            for (Email actEmail : emails) {
+                emailEntities.add(EmailEntity.fromScim(actEmail));
             }
         }
         return emailEntities;
@@ -608,64 +626,64 @@ public class UserEntity extends InternalIdSkeleton {
                 build();
     }
 
-    private List<MultiValuedAttribute> entityX509CertificatesToScim(Set<X509CertificateEntity> x509CertificateEntities) {
-        List<MultiValuedAttribute> x509CertificatesForMapping = new ArrayList<>();
+    private List<X509Certificate> entityX509CertificatesToScim(Set<X509CertificateEntity> x509CertificateEntities) {
+        List<X509Certificate> x509CertificatesForMapping = new ArrayList<>();
         for (X509CertificateEntity x509CertificateEntity : x509CertificateEntities) {
             x509CertificatesForMapping.add(x509CertificateEntity.toScim());
         }
         return x509CertificatesForMapping;
     }
 
-    private List<MultiValuedAttribute> entityRolesToScim(Set<RolesEntity> rolesEntities) {
-        List<MultiValuedAttribute> rolesForMapping = new ArrayList<>();
+    private List<Role> entityRolesToScim(Set<RolesEntity> rolesEntities) {
+        List<Role> rolesForMapping = new ArrayList<>();
         for (RolesEntity rolesEntity : rolesEntities) {
             rolesForMapping.add(rolesEntity.toScim());
         }
         return rolesForMapping;
     }
 
-    private List<MultiValuedAttribute> entityPhotosToScim(Set<PhotoEntity> photoEntities) {
-        List<MultiValuedAttribute> photosForMapping = new ArrayList<>();
+    private List<Photo> entityPhotosToScim(Set<PhotoEntity> photoEntities) {
+        List<Photo> photosForMapping = new ArrayList<>();
         for (PhotoEntity photoEntity : photoEntities) {
             photosForMapping.add(photoEntity.toScim());
         }
         return photosForMapping;
     }
 
-    private List<MultiValuedAttribute> entityPhonenumbersToScim(Set<PhoneNumberEntity> phoneNumberEntities) {
-        List<MultiValuedAttribute> phoneNumbersForMapping = new ArrayList<>();
+    private List<PhoneNumber> entityPhonenumbersToScim(Set<PhoneNumberEntity> phoneNumberEntities) {
+        List<PhoneNumber> phoneNumbersForMapping = new ArrayList<>();
         for (PhoneNumberEntity phoneNumberEntity : phoneNumberEntities) {
             phoneNumbersForMapping.add(phoneNumberEntity.toScim());
         }
         return phoneNumbersForMapping;
     }
 
-    private List<MultiValuedAttribute> entityImsToScim(Set<ImEntity> imEntities) {
-        List<MultiValuedAttribute> imsForMapping = new ArrayList<>();
+    private List<Ims> entityImsToScim(Set<ImEntity> imEntities) {
+        List<Ims> imsForMapping = new ArrayList<>();
         for (ImEntity imEntity : imEntities) {
             imsForMapping.add(imEntity.toScim());
         }
         return imsForMapping;
     }
 
-    private List<MultiValuedAttribute> entityGroupsToScim(Set<GroupEntity> groupEntities) {
-        List<MultiValuedAttribute> groupsForMapping = new ArrayList<>();
+    private List<GroupRef> entityGroupsToScim(Set<GroupEntity> groupEntities) {
+        List<GroupRef> groupsForMapping = new ArrayList<>();
         for (GroupEntity groupEntity : groupEntities) {
-            groupsForMapping.add(groupEntity.toMultiValueScim());
+            groupsForMapping.add(groupEntity.toGroupRefScim());
         }
         return groupsForMapping;
     }
 
-    private List<MultiValuedAttribute> entityEntitlementsToScim(Set<EntitlementsEntity> entitlementsEntities) {
-        List<MultiValuedAttribute> entitlementsForMapping = new ArrayList<>();
+    private List<Entitlement> entityEntitlementsToScim(Set<EntitlementsEntity> entitlementsEntities) {
+        List<Entitlement> entitlementsForMapping = new ArrayList<>();
         for (EntitlementsEntity entitlementsEntity : entitlementsEntities) {
             entitlementsForMapping.add(entitlementsEntity.toScim());
         }
         return entitlementsForMapping;
     }
 
-    private List<MultiValuedAttribute> entityEmailToScim(Set<EmailEntity> emailEntities) {
-        List<MultiValuedAttribute> emailsForMapping = new ArrayList<>();
+    private List<Email> entityEmailToScim(Set<EmailEntity> emailEntities) {
+        List<Email> emailsForMapping = new ArrayList<>();
         for (EmailEntity emailEntity : emailEntities) {
             emailsForMapping.add(emailEntity.toScim());
         }

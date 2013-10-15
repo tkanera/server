@@ -23,10 +23,10 @@
 
 package org.osiam.storage.entities
 
-import org.osiam.resources.scim.MultiValuedAttribute
-import org.osiam.storage.entities.ImEntity
-import org.osiam.storage.entities.UserEntity
-import spock.lang.Specification
+import org.osiam.resources.scim.Ims;
+import org.osiam.resources.type.ImsType;
+
+import spock.lang.Specification;
 
 /**
  * Created with IntelliJ IDEA.
@@ -50,10 +50,10 @@ class ImEntitySpec extends Specification {
 
     def "setter and getter for the type should be present"() {
         when:
-        imsEntity.setType("gtalk")
+        imsEntity.setType(ImsType.GTALK)
 
         then:
-        imsEntity.getType() == "gtalk"
+        imsEntity.getType() == ImsType.GTALK
     }
 
     def "setter and getter for the user should be present"() {
@@ -75,9 +75,9 @@ class ImEntitySpec extends Specification {
 
     def "mapping from scim should be present"() {
         given:
-        MultiValuedAttribute multiValuedAttribute = new MultiValuedAttribute.Builder().
+        Ims multiValuedAttribute = new Ims.Builder().
                 setValue("blaaaa").
-                setType("icq").
+                setType(ImsType.ICQ).
                 build()
 
         when:
@@ -85,15 +85,6 @@ class ImEntitySpec extends Specification {
 
         then:
         result != null
-    }
-
-    def "should throw an exception if the type is unknown"() {
-        when:
-        imsEntity.setType("huch")
-
-        then:
-        def e = thrown(IllegalArgumentException)
-        e.message == "No enum constant org.osiam.storage.entities.ImEntity.CanonicalImTypes.huch"
     }
 
     def "setter and getter for id should be present"() {

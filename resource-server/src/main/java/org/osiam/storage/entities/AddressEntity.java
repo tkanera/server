@@ -24,6 +24,7 @@
 package org.osiam.storage.entities;
 
 import org.osiam.resources.scim.Address;
+import org.osiam.resources.type.AddressType;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -43,7 +44,7 @@ public class AddressEntity implements Serializable {
     
     @Column
     @Enumerated(EnumType.STRING)
-    private CanonicalAddressTypes type;
+    private AddressType type;
 
     
     @Column
@@ -69,10 +70,6 @@ public class AddressEntity implements Serializable {
     @Column
     private String country;
 
-    
-    @Column(name = "postgresql_does_not_like_primary")
-    private Boolean primary;
-
     @ManyToOne
     private UserEntity user;
 
@@ -85,25 +82,12 @@ public class AddressEntity implements Serializable {
         this.id = id;
     }
 
-    public boolean isPrimary() {
-        return primary;
+    public AddressType getType() {
+        return type;
     }
 
-    public void setPrimary(boolean primary) {
-        this.primary = primary;
-    }
-
-    public String getType() {
-        if (type != null) {
-            return type.toString();
-        }
-        return null;
-    }
-
-    public void setType(String type) {
-        if (type != null) {
-            this.type = CanonicalAddressTypes.valueOf(type);
-        }
+    public void setType(AddressType type) {
+        this.type = type;
     }
 
     public String getFormatted() {
@@ -179,14 +163,10 @@ public class AddressEntity implements Serializable {
         addressEntity.setFormatted(address.getFormatted());
         addressEntity.setLocality(address.getLocality());
         addressEntity.setPostalCode(address.getPostalCode());
-        addressEntity.setPrimary((address.isPrimary() == null ? false : address.isPrimary()));
         addressEntity.setRegion(address.getRegion());
         addressEntity.setStreetAddress(address.getStreetAddress());
         addressEntity.setType(address.getType());
         return addressEntity;
     }
 
-    private enum CanonicalAddressTypes {
-        work, home, other
-    }
 }

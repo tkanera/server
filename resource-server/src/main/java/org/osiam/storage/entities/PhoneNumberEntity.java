@@ -23,37 +23,38 @@
 
 package org.osiam.storage.entities;
 
-import org.osiam.resources.scim.MultiValuedAttribute;
-
-import javax.persistence.*;
 import java.io.Serializable;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.ManyToOne;
+
+import org.osiam.resources.scim.PhoneNumber;
+import org.osiam.resources.type.PhoneNumberType;
 
 /**
  * Phone Numbers Entity
  */
 @Entity(name = "scim_phoneNumber")
-public class PhoneNumberEntity extends MultiValueAttributeEntitySkeleton implements ChildOfMultiValueAttributeWithIdAndType, HasUser, Serializable {
+public class PhoneNumberEntity extends MultiValueAttributeEntitySkeleton implements ChildOfMultiValueAttributeWithIdAndType<PhoneNumberType>, HasUser, Serializable {
 
     private static final long serialVersionUID = -6535056565639157058L;
 
     @Column
     @Enumerated(EnumType.STRING)
-    private CanonicalPhoneNumberTypes type;
+    private PhoneNumberType type;
 
     @ManyToOne
     private UserEntity user;
 
-    public String getType() {
-        if(type != null) {
-            return type.toString();
-        }
-        return null;
+    public PhoneNumberType getType() {
+        return type;
     }
 
-    public void setType(String type) {
-        if(type != null) {
-            this.type = CanonicalPhoneNumberTypes.valueOf(type);
-        }
+    public void setType(PhoneNumberType type) {
+        this.type = type;
     }
 
     public UserEntity getUser() {
@@ -64,21 +65,18 @@ public class PhoneNumberEntity extends MultiValueAttributeEntitySkeleton impleme
         this.user = user;
     }
 
-    public MultiValuedAttribute toScim() {
-        return new MultiValuedAttribute.Builder().
+    public PhoneNumber toScim() {
+        return new PhoneNumber.Builder().
                 setType(getType()).
                 setValue(getValue()).
                 build();
     }
 
-    public static PhoneNumberEntity fromScim(MultiValuedAttribute multiValuedAttribute) {
+    public static PhoneNumberEntity fromScim(PhoneNumber multiValuedAttribute) {
         PhoneNumberEntity phoneNumberEntity = new PhoneNumberEntity();
         phoneNumberEntity.setType(multiValuedAttribute.getType());
         phoneNumberEntity.setValue(String.valueOf(multiValuedAttribute.getValue()));
         return phoneNumberEntity;
     }
 
-    public enum CanonicalPhoneNumberTypes {
-        work, home, mobile, fax, pager, other
-    }
 }

@@ -23,14 +23,14 @@
 
 package org.osiam.resources.provisioning
 
-import org.osiam.storage.dao.GroupDAO
-import org.osiam.resources.provisioning.SCIMGroupProvisioningBean
 import org.osiam.resources.scim.Group
+import org.osiam.resources.scim.Member
 import org.osiam.resources.scim.Meta
-import org.osiam.resources.scim.MultiValuedAttribute
 import org.osiam.resources.scim.User
+import org.osiam.storage.dao.GroupDAO
 import org.osiam.storage.entities.GroupEntity
 import org.osiam.storage.entities.UserEntity
+
 import spock.lang.Specification
 
 class GroupPatchTest extends Specification {
@@ -43,10 +43,9 @@ class GroupPatchTest extends Specification {
 
     def "should delete a single group in members"() {
         def members = new HashSet()
-        members.add(new MultiValuedAttribute.Builder().setValue(groupId.toString()).setOperation("delete").build())
-        def group = new Group.Builder()
+        members.add(new Member.Builder().setValue(groupId.toString()).setOperation("delete").build())
+        def group = new Group.Builder("hi")
                 .setMembers(members)
-                .setDisplayName("hi")
                 .build()
         def entity = createEntityWithInternalId()
         addListsToEntity(entity)
@@ -61,10 +60,9 @@ class GroupPatchTest extends Specification {
 
     def "should delete a single user in members"() {
         def members = new HashSet()
-        members.add(new MultiValuedAttribute.Builder().setValue(userId.toString()).setOperation("delete").build())
-        def group = new Group.Builder()
+        members.add(new Member.Builder().setValue(userId.toString()).setOperation("delete").build())
+        def group = new Group.Builder("hi")
                 .setMembers(members)
-                .setDisplayName("hi")
                 .build()
         def entity = createEntityWithInternalId()
         addListsToEntity(entity)
@@ -77,12 +75,10 @@ class GroupPatchTest extends Specification {
         1 * groupDAO.update(entity) >> entity
     }
 
-
     private void addListsToEntity(GroupEntity entity) {
         entity.getMembers().add(new GroupEntity(id: groupId, displayName: "group"))
         entity.getMembers().add(new UserEntity(id: userId, displayName: "user"))
     }
-
 
     def "should delete all attributes of a multi-value-attribute list"() {
         def meta = new Meta.Builder(null, null).setAttributes(["members"] as Set).build()
@@ -104,10 +100,9 @@ class GroupPatchTest extends Specification {
     def "should add a multi-value to a attribute list"() {
         def members = new HashSet()
         def newUuid = UUID.randomUUID().toString()
-        members.add(new MultiValuedAttribute.Builder().setValue(newUuid).setDisplay("narf").build())
-        def group = new Group.Builder()
+        members.add(new Member.Builder().setValue(newUuid).setDisplay("narf").build())
+        def group = new Group.Builder("hi")
                 .setMembers(members)
-                .setDisplayName("hi")
                 .build()
         def entity = createEntityWithInternalId()
         addListsToEntity(entity)
@@ -122,11 +117,10 @@ class GroupPatchTest extends Specification {
     def "should delete and add a value to a multi-value-attribute list"() {
         def members = new HashSet()
         def newUuid = UUID.randomUUID().toString()
-        members.add(new MultiValuedAttribute.Builder().setValue(newUuid).setDisplay("narf").build())
-        members.add(new MultiValuedAttribute.Builder().setValue(userId).setOperation("delete").build())
-        def group = new Group.Builder()
+        members.add(new Member.Builder().setValue(newUuid).setDisplay("narf").build())
+        members.add(new Member.Builder().setValue(userId.toString()).setOperation("delete").build())
+        def group = new Group.Builder("hi")
                 .setMembers(members)
-                .setDisplayName("hi")
                 .build()
         def entity = createEntityWithInternalId()
         addListsToEntity(entity)
@@ -140,10 +134,9 @@ class GroupPatchTest extends Specification {
 
     }
 
-
     def "should update a single attribute"() {
         given:
-        def group = new Group.Builder().setDisplayName("hallo").build()
+        def group = new Group.Builder("hallo").build()
         def entity = createEntityWithInternalId()
 
         when:
@@ -161,8 +154,6 @@ class GroupPatchTest extends Specification {
         entity.id = uId
         entity
     }
-
-
 
     def "should ignore when trying to delete required parameters"() {
         given:
@@ -182,7 +173,7 @@ class GroupPatchTest extends Specification {
         given:
         def meta = new Meta.Builder(null, null).setAttributes(["members"] as Set).build()
 
-        def group = new Group.Builder().setDisplayName("harald").setMeta(meta).build()
+        def group = new Group.Builder("harald").setMeta(meta).build()
         def entity = createEntityWithInternalId()
         addListsToEntity(entity)
         when:
@@ -200,7 +191,7 @@ class GroupPatchTest extends Specification {
         def meta = new Meta.Builder(null, null).setAttributes(["members"] as Set).build()
 
         def members = new HashSet()
-        members.add(new MultiValuedAttribute.Builder().setValue(UUID.randomUUID().toString()).build())
+        members.add(new Member.Builder().setValue(UUID.randomUUID().toString()).build())
 
         def user = new Group.Builder().setMembers(members).setMeta(meta).build()
         def entity = createEntityWithInternalId()
@@ -213,7 +204,6 @@ class GroupPatchTest extends Specification {
         entity.getMembers().empty
         1 * groupDAO.update(entity) >> entity
     }
-
 
     def "should ignore read-only attributes on modify"() {
         given:
@@ -245,7 +235,7 @@ class GroupPatchTest extends Specification {
 
     def "should set Meta.lastModified to actual date on update resource"() {
         given:
-        def group = new Group.Builder().setDisplayName("hallo").build()
+        def group = new Group.Builder("hallo").build()
         def entity = createEntityWithInternalId()
 
         def lastModified = entity.getMeta().getLastModified()
@@ -262,7 +252,7 @@ class GroupPatchTest extends Specification {
 
     def "should set Meta.lastModified to actual date on replace resource"() {
         given:
-        def group = new Group.Builder().setDisplayName("hallo").build()
+        def group = new Group.Builder("hallo").build()
         def entity = createEntityWithInternalId()
 
         def lastModified = entity.getMeta().getLastModified()

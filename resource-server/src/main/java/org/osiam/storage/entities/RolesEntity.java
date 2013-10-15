@@ -23,9 +23,9 @@
 
 package org.osiam.storage.entities;
 
-import org.osiam.resources.scim.MultiValuedAttribute;
-
 import javax.persistence.Entity;
+
+import org.osiam.resources.scim.Role;
 
 /**
  * Roles Entity
@@ -35,15 +35,15 @@ public class RolesEntity extends MultiValueAttributeEntitySkeleton {
 
     private static final long serialVersionUID = 1546546513218916131L;
 
-    public MultiValuedAttribute toScim() {
-        return new MultiValuedAttribute.Builder().
+    public Role toScim() {
+        return new Role.Builder().
                 setValue(getValue()).
                 build();
     }
 
-    public static RolesEntity fromScim(MultiValuedAttribute multiValuedAttribute) {
+    public static RolesEntity fromScim(Role role) {
         RolesEntity rolesEntity = new RolesEntity();
-        rolesEntity.setValue(String.valueOf(multiValuedAttribute.getValue()));
+        rolesEntity.setValue(String.valueOf(role.getValue()));
         return rolesEntity;
     }
 }

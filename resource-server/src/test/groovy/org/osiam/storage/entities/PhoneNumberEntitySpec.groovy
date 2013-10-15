@@ -23,10 +23,10 @@
 
 package org.osiam.storage.entities
 
-import org.osiam.resources.scim.MultiValuedAttribute
-import org.osiam.storage.entities.PhoneNumberEntity
-import org.osiam.storage.entities.UserEntity
-import spock.lang.Specification
+import org.osiam.resources.scim.PhoneNumber;
+import org.osiam.resources.type.PhoneNumberType;
+
+import spock.lang.Specification;
 
 /**
  * Created with IntelliJ IDEA.
@@ -50,10 +50,10 @@ class PhoneNumberEntitySpec extends Specification {
 
     def "setter and getter for the type should be present"() {
         when:
-        phoneNumberEntity.setType("work")
+        phoneNumberEntity.setType(PhoneNumberType.WORK)
 
         then:
-        phoneNumberEntity.getType() == "work"
+        phoneNumberEntity.getType() == PhoneNumberType.WORK
     }
 
     def "setter and getter for the user should be present"() {
@@ -75,9 +75,9 @@ class PhoneNumberEntitySpec extends Specification {
 
     def "mapping from scim should be present"() {
         given:
-        MultiValuedAttribute phoneNumber = new MultiValuedAttribute.Builder().
+        PhoneNumber phoneNumber = new PhoneNumber.Builder().
                 setValue("blaaaa").
-                setType("home").
+                setType(PhoneNumberType.HOME).
                 build()
 
         when:
@@ -85,15 +85,6 @@ class PhoneNumberEntitySpec extends Specification {
 
         then:
         result != null
-    }
-
-    def "should throw an exception if the type is unknown"() {
-        when:
-        phoneNumberEntity.setType("huch")
-
-        then:
-        def e = thrown(IllegalArgumentException)
-        e.message == "No enum constant org.osiam.storage.entities.PhoneNumberEntity.CanonicalPhoneNumberTypes.huch"
     }
 
     def "setter and getter for id should be present"() {

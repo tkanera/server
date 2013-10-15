@@ -23,12 +23,21 @@
 
 package org.osiam.storage.entities;
 
-import org.osiam.resources.scim.MultiValuedAttribute;
-
-import javax.persistence.*;
 import java.io.Serializable;
 import java.util.GregorianCalendar;
 import java.util.UUID;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.Transient;
 
 @Entity(name = "scim_id")
 @Inheritance(strategy = InheritanceType.JOINED)
@@ -85,9 +94,9 @@ public abstract class InternalIdSkeleton implements ChildOfMultiValueAttribute, 
 
     public abstract String getDisplayName();
 
-    public MultiValuedAttribute toMultiValueScim() {
+  /*  public MultiValuedAttribute toMultiValueScim() {
         return new MultiValuedAttribute.Builder().setDisplay(getDisplayName()).setValue(id).build();
-    }
+    } TODO kann vermutlich entfernt werden*/ 
 
     @Override
     @Transient

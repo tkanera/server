@@ -81,24 +81,6 @@ class OsiamExceptionHandlerTest extends Specification {
         (result.getBody() as OsiamExceptionHandler.JsonErrorResult).description == "Delivered schema is unknown."
     }
 
-    def "should transform *Entity No enum constant error message to a more readable error response"() {
-        when:
-        def result = underTest.handleConflict(e, request)
-        then:
-        (result.getBody() as OsiamExceptionHandler.JsonErrorResult).description ==
-                "huch is not a valid " + name + " are allowed."
-        where:
-        name << ["PhoneNumber type only work, home, mobile, fax, pager, other",
-                "Im type only aim, gtalk, icq, xmpp, msn, skype, qq, yahoo",
-                "Email type only work, home, other",
-                "Photo type only photo, thumbnail"]
-
-        e << [get_exception { new PhoneNumberEntity().setType("huch") },
-                get_exception { new ImEntity().setType("huch") },
-                get_exception { new EmailEntity().setType("huch") },
-                get_exception { new PhotoEntity().setType("huch") }]
-    }
-
     def get_exception(Closure c) {
         try {
             c.call()

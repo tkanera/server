@@ -23,10 +23,10 @@
 
 package org.osiam.storage.entities
 
-import org.osiam.resources.scim.MultiValuedAttribute
-import org.osiam.storage.entities.PhotoEntity
-import org.osiam.storage.entities.UserEntity
-import spock.lang.Specification
+import org.osiam.resources.scim.Photo;
+import org.osiam.resources.type.PhotoType;
+
+import spock.lang.Specification;
 
 class PhotoEntitySpec extends Specification {
 
@@ -45,10 +45,10 @@ class PhotoEntitySpec extends Specification {
 
     def "setter and getter for the type should be present"() {
         when:
-        photoEntity.setType("thumbnail")
+        photoEntity.setType(PhotoType.THUMBNAIL)
 
         then:
-        photoEntity.getType() == "thumbnail"
+        photoEntity.getType() == PhotoType.THUMBNAIL
     }
 
     def "setter and getter for the user should be present"() {
@@ -70,9 +70,9 @@ class PhotoEntitySpec extends Specification {
 
     def "mapping from scim should be present"() {
         given:
-        MultiValuedAttribute multiValuedAttribute = new MultiValuedAttribute.Builder().
+        Photo multiValuedAttribute = new Photo.Builder().
                 setValue("http://localhorst:8080/photo.png").
-                setType("photo").
+                setType(PhotoType.PHOTO).
                 build()
 
         when:
@@ -88,15 +88,6 @@ class PhotoEntitySpec extends Specification {
 
         then:
         photoEntity.getValue() == "file.JPG"
-    }
-
-    def "should throw an exception if the type is unknown"() {
-        when:
-        photoEntity.setType("huch")
-
-        then:
-        def e = thrown(IllegalArgumentException)
-        e.message == "No enum constant org.osiam.storage.entities.PhotoEntity.CanonicalPhotoTypes.huch"
     }
 
     def "setter and getter for id should be present"() {

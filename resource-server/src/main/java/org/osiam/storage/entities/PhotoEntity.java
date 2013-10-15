@@ -23,17 +23,23 @@
 
 package org.osiam.storage.entities;
 
-import org.osiam.resources.scim.MultiValuedAttribute;
-
-import javax.persistence.*;
 import java.io.Serializable;
 import java.util.regex.Pattern;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.ManyToOne;
+
+import org.osiam.resources.scim.Photo;
+import org.osiam.resources.type.PhotoType;
 
 /**
  * Photos Entity
  */
 @Entity(name = "scim_photo")
-public class PhotoEntity extends MultiValueAttributeEntitySkeleton implements ChildOfMultiValueAttributeWithIdAndType, HasUser, Serializable {
+public class PhotoEntity extends MultiValueAttributeEntitySkeleton implements ChildOfMultiValueAttributeWithIdAndType<PhotoType>, HasUser, Serializable {
 
     private static final long serialVersionUID = -4535056565639057058L;
 
@@ -42,7 +48,7 @@ public class PhotoEntity extends MultiValueAttributeEntitySkeleton implements Ch
 
     @Column
     @Enumerated(EnumType.STRING)
-    private CanonicalPhotoTypes type;
+    private PhotoType type;
 
     @ManyToOne
     private UserEntity user;
@@ -63,17 +69,12 @@ public class PhotoEntity extends MultiValueAttributeEntitySkeleton implements Ch
         return !PHOTO_SUFFIX.matcher(value).matches();
     }
 
-    public String getType() {
-        if(type != null) {
-            return type.toString();
-        }
-        return null;
+    public PhotoType getType() {
+        return type;
     }
 
-    public void setType(String type) {
-        if(type != null) {
-            this.type = CanonicalPhotoTypes.valueOf(type);
-        }
+    public void setType(PhotoType type) {
+        this.type = type;
     }
 
     public UserEntity getUser() {
@@ -84,21 +85,18 @@ public class PhotoEntity extends MultiValueAttributeEntitySkeleton implements Ch
         this.user = user;
     }
 
-    public MultiValuedAttribute toScim() {
-        return new MultiValuedAttribute.Builder().
+    public Photo toScim() {
+        return new Photo.Builder().
                 setType(getType()).
                 setValue(getValue()).
                 build();
     }
 
-    public static PhotoEntity fromScim(MultiValuedAttribute multiValuedAttribute) {
+    public static PhotoEntity fromScim(Photo multiValuedAttribute) {
         PhotoEntity photoEntity = new PhotoEntity();
         photoEntity.setType(multiValuedAttribute.getType());
         photoEntity.setValue(String.valueOf(multiValuedAttribute.getValue()));
         return photoEntity;
     }
 
-    public enum CanonicalPhotoTypes {
-        photo, thumbnail
-    }
 }

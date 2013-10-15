@@ -23,15 +23,17 @@
 
 package org.osiam.resources.provisioning;
 
-import org.osiam.storage.entities.ChildOfMultiValueAttribute;
-import org.osiam.storage.entities.ChildOfMultiValueAttributeWithIdAndType;
-import org.osiam.storage.entities.ChildOfMultiValueAttributeWithIdAndTypeAndPrimary;
-import org.osiam.resources.scim.MultiValuedAttribute;
-
 import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.Locale;
 import java.util.Map;
+
+import org.osiam.resources.scim.MultiValuedAttributeBasicFields;
+import org.osiam.resources.scim.MultiValuedAttributeWithTypeField;
+import org.osiam.resources.scim.PrimaryMultiValuedAttribute;
+import org.osiam.storage.entities.ChildOfMultiValueAttribute;
+import org.osiam.storage.entities.ChildOfMultiValueAttributeWithIdAndType;
+import org.osiam.storage.entities.ChildOfMultiValueAttributeWithIdAndTypeAndPrimary;
 
 public class EntityListFieldWrapper {
 
@@ -87,21 +89,21 @@ public class EntityListFieldWrapper {
         clearIfNotInPatchMode(targetList);
         if (listOfMultiValue == null) { return; }
         for (Object o : listOfMultiValue) {
-            MultiValuedAttribute m = (MultiValuedAttribute) o;
+            MultiValuedAttributeBasicFields m = (MultiValuedAttributeBasicFields) o;
             if (notDeleted(m, targetList)) {
                 addSingleObject(clazz, targetList, m);
             }
         }
     }
 
-    private boolean notDeleted(MultiValuedAttribute m, Collection<Object> targetList) {
+    private boolean notDeleted(MultiValuedAttributeBasicFields m, Collection<Object> targetList) {
         boolean equals = "delete".equals(m.getOperation());
         if (equals) { seekAndDelete(m, targetList); }
         return !equals;
 
     }
 
-    private void seekAndDelete(MultiValuedAttribute m, Collection<Object> targetList) {
+    private void seekAndDelete(MultiValuedAttributeBasicFields m, Collection<Object> targetList) {
         for (Object o : targetList) {
             if (deleteSingleAttribute(m, targetList, o)) {
                 return;
@@ -109,14 +111,14 @@ public class EntityListFieldWrapper {
         }
     }
 
-    private boolean deleteSingleAttribute(MultiValuedAttribute m, Collection<Object> targetList, Object o) {
+    private boolean deleteSingleAttribute(MultiValuedAttributeBasicFields m, Collection<Object> targetList, Object o) {
         ChildOfMultiValueAttribute valueAttribute = (ChildOfMultiValueAttribute) o;
         String value = valueAttribute.getValue().toUpperCase(Locale.ENGLISH);
         Object mValue = String.valueOf(m.getValue()).toUpperCase(Locale.ENGLISH);
         return mValue.equals(value) && targetList.remove(o);
     }
 
-    private void addSingleObject(Class<?> clazz, Collection<Object> collection, MultiValuedAttribute m)
+    private void addSingleObject(Class<?> clazz, Collection<Object> collection, MultiValuedAttributeBasicFields m)
             throws InstantiationException, IllegalAccessException {
         Object target = createSingleObject(clazz, m);
         removeExistingValues(collection, m);
@@ -124,7 +126,7 @@ public class EntityListFieldWrapper {
 
     }
 
-    private void removeExistingValues(Collection<Object> collection, MultiValuedAttribute multiValuedAttribute) {
+    private void removeExistingValues(Collection<Object> collection, MultiValuedAttributeBasicFields multiValuedAttribute) {
         if (mode != GenericSCIMToEntityWrapper.Mode.PATCH) {
             return;
         }
@@ -137,24 +139,35 @@ public class EntityListFieldWrapper {
     }
 
     private boolean removeWhenValueExists(Collection<Object> collection, Object o,
-                                          MultiValuedAttribute multiValuedAttribute) {
+                                          MultiValuedAttributeBasicFields multiValuedAttribute) {
         ChildOfMultiValueAttribute entityValue = (ChildOfMultiValueAttribute) o;
         boolean valueIsEqual = entityValue.getValue().equals(multiValuedAttribute.getValue());
         return valueIsEqual && collection.remove(o);
     }
 
-    private Object createSingleObject(Class<?> clazz, MultiValuedAttribute m)
+    private Object createSingleObject(Class<?> clazz, MultiValuedAttributeBasicFields m)
             throws InstantiationException, IllegalAccessException {
         Object target = clazz.newInstance();
 
         ((ChildOfMultiValueAttribute) target).setValue(m.getValue() == null ? null : String.valueOf(m.getValue()));
 
         if (target instanceof ChildOfMultiValueAttributeWithIdAndType) {
-            ((ChildOfMultiValueAttributeWithIdAndType) target).setType(m.getType());
+        	if(m instanceof MultiValuedAttributeWithTypeField){
+        		((ChildOfMultiValueAttributeWithIdAndType) target).setType(
+        				((MultiValuedAttributeWithTypeField)m).getType());	
+        	}else{
+        		throw new IllegalArgumentException("TODO");
+        	}
+            
         }
         if (target instanceof ChildOfMultiValueAttributeWithIdAndTypeAndPrimary) {
-            ((ChildOfMultiValueAttributeWithIdAndTypeAndPrimary) target)
-                    .setPrimary(m.isPrimary() != null ? m.isPrimary() : false);
+        	if(m instanceof PrimaryMultiValuedAttribute){
+        		PrimaryMultiValuedAttribute attributeWithPrimary = (PrimaryMultiValuedAttribute)m;	
+	            ((ChildOfMultiValueAttributeWithIdAndTypeAndPrimary) target)
+	                    .setPrimary((attributeWithPrimary.isPrimary() != null ? attributeWithPrimary.isPrimary() : false));
+        	}else{
+        		throw new IllegalArgumentException("TODO");
+        	}
         }
         return target;
     }

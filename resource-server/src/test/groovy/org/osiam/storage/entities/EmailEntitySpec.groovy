@@ -23,10 +23,10 @@
 
 package org.osiam.storage.entities
 
-import org.osiam.resources.scim.MultiValuedAttribute
-import org.osiam.storage.entities.EmailEntity
-import org.osiam.storage.entities.UserEntity
-import spock.lang.Specification
+import org.osiam.resources.scim.Email;
+import org.osiam.resources.type.EmailType;
+
+import spock.lang.Specification;
 
 /**
  * Created with IntelliJ IDEA.
@@ -50,10 +50,10 @@ class EmailEntitySpec extends Specification {
 
     def "setter and getter for the type should be present"() {
         when:
-        emailEntity.setType("home")
+        emailEntity.setType(EmailType.HOME)
 
         then:
-        emailEntity.getType() == "home"
+        emailEntity.getType() == EmailType.HOME
     }
 
     def "setter and getter for primary should be present"() {
@@ -86,9 +86,9 @@ class EmailEntitySpec extends Specification {
 
     def "mapping from scim should be present"() {
         given:
-        MultiValuedAttribute multiValuedAttribute = new MultiValuedAttribute.Builder().
+        Email multiValuedAttribute = new Email.Builder().
                 setPrimary(true).
-                setType("work").
+                setType(EmailType.WORK).
                 setValue("value").
                 build()
 
@@ -101,9 +101,9 @@ class EmailEntitySpec extends Specification {
 
     def "mapping from scim should set primary to false when null"() {
         given:
-        MultiValuedAttribute multiValuedAttribute = new MultiValuedAttribute.Builder().
+        Email multiValuedAttribute = new Email.Builder().
                 setPrimary(null).
-                setType("work").
+                setType(EmailType.WORK).
                 setValue("value").
                 build()
 
@@ -112,15 +112,6 @@ class EmailEntitySpec extends Specification {
 
         then:
         !result.primary
-    }
-
-    def "should throw an exception if the type is unknown"() {
-        when:
-        emailEntity.setType("huch")
-
-        then:
-        def e = thrown(IllegalArgumentException)
-        e.message == "No enum constant org.osiam.storage.entities.EmailEntity.CanonicalEmailTypes.huch"
     }
 
     def "setter and getter for id should be present"() {

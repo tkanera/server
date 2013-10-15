@@ -23,11 +23,14 @@
 
 package org.osiam.storage.entities;
 
+import org.osiam.resources.type.GenericType;
+
 /**
  * Means that an Entity is expressed by an MultiValuedAttribute in SCIM and has also a type and primary field.
  *
  */
-public interface ChildOfMultiValueAttributeWithIdAndTypeAndPrimary extends ChildOfMultiValueAttributeWithIdAndType {
+public interface ChildOfMultiValueAttributeWithIdAndTypeAndPrimary<E extends GenericType<E>> 
+										extends ChildOfMultiValueAttributeWithIdAndType<E> {
 
     boolean isPrimary();
 

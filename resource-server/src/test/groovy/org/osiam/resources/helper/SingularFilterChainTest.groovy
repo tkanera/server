@@ -19,6 +19,10 @@
 
 package org.osiam.resources.helper
 
+import org.osiam.resources.type.EmailType;
+import org.osiam.resources.type.GenericType;
+import org.osiam.resources.type.ImsType;
+import org.osiam.resources.type.PhoneNumberType;
 import org.osiam.storage.entities.EmailEntity
 import org.osiam.storage.entities.ImEntity
 import org.osiam.storage.entities.MetaEntity
@@ -184,15 +188,7 @@ class SingularFilterChainTest extends Specification{
         then:
         result.propertyName == 'emails.type'
         result.op == "="
-        result.value instanceof EmailEntity.CanonicalEmailTypes
-    }
-
-    def "should throw exception if emails.type mismatch"() {
-        when:
-        new SingularFilterChain("emails.type eq crap", aClass).buildCriterion()
-        then:
-        def result = thrown(IllegalArgumentException.class)
-        result.getMessage() == "No enum constant org.osiam.storage.entities.EmailEntity.CanonicalEmailTypes.crap"
+        result.value instanceof GenericType<EmailType>
     }
 
     def "should be possible to search for multiValue types like phoneNumbers.type"() {
@@ -201,15 +197,7 @@ class SingularFilterChainTest extends Specification{
         then:
         result.propertyName == 'phoneNumbers.type'
         result.op == "="
-        result.value instanceof PhoneNumberEntity.CanonicalPhoneNumberTypes
-    }
-
-    def "should throw exception if phoneNumbers.type mismatch"() {
-        when:
-        new SingularFilterChain("phoneNumbers.type eq crap", aClass).buildCriterion()
-        then:
-        def result = thrown(IllegalArgumentException.class)
-        result.getMessage() == "No enum constant org.osiam.storage.entities.PhoneNumberEntity.CanonicalPhoneNumberTypes.crap"
+        result.value instanceof GenericType<PhoneNumberType>
     }
 
     def "should be possible to search for multiValue types like photos.type"() {
@@ -218,15 +206,7 @@ class SingularFilterChainTest extends Specification{
         then:
         result.propertyName == 'photos.type'
         result.op == "="
-        result.value instanceof PhotoEntity.CanonicalPhotoTypes
-    }
-
-    def "should throw exception if photos.type mismatch"() {
-        when:
-        new SingularFilterChain("photos.type eq crap", aClass).buildCriterion()
-        then:
-        def result = thrown(IllegalArgumentException.class)
-        result.getMessage() == "No enum constant org.osiam.storage.entities.PhotoEntity.CanonicalPhotoTypes.crap"
+        result.value instanceof GenericType<PhotoType>
     }
 
     def "should be possible to search for multiValue types like ims.type"() {
@@ -235,15 +215,7 @@ class SingularFilterChainTest extends Specification{
         then:
         result.propertyName == 'ims.type'
         result.op == "="
-        result.value instanceof ImEntity.CanonicalImTypes
-    }
-
-    def "should throw exception if ims.type mismatch"() {
-        when:
-        new SingularFilterChain("ims.type eq crap", aClass).buildCriterion()
-        then:
-        def result = thrown(IllegalArgumentException.class)
-        result.getMessage() == "No enum constant org.osiam.storage.entities.ImEntity.CanonicalImTypes.crap"
+        result.value instanceof GenericType<ImsType>
     }
 
     def "should be possible to search for address boolean values like addresses.primary"() {

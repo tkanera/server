@@ -23,38 +23,40 @@
 
 package org.osiam.storage.entities;
 
-import org.osiam.resources.scim.MultiValuedAttribute;
-
-import javax.persistence.*;
 import java.io.Serializable;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.ManyToOne;
+
+import org.osiam.resources.scim.Ims;
+import org.osiam.resources.type.ImsType;
 
 /**
  * Instant messaging Entity
  */
 @Entity(name = "scim_im")
-public class ImEntity extends MultiValueAttributeEntitySkeleton implements ChildOfMultiValueAttributeWithIdAndType, HasUser, Serializable {
+public class ImEntity extends MultiValueAttributeEntitySkeleton 
+			implements ChildOfMultiValueAttributeWithIdAndType<ImsType>, HasUser, Serializable {
 
     private static final long serialVersionUID = -6835056565639057058L;
 
     @Column
     @Enumerated(EnumType.STRING)
-    private CanonicalImTypes type;
+    private ImsType type;
 
     @ManyToOne
     private UserEntity user;
 
 
-    public String getType() {
-        if(type != null) {
-            return type.toString();
-        }
-        return null;
+    public ImsType getType() {
+        return type;
     }
 
-    public void setType(String type) {
-        if(type != null) {
-            this.type = CanonicalImTypes.valueOf(type);
-        }
+    public void setType(ImsType type) {
+        this.type = type;
     }
 
     public UserEntity getUser() {
@@ -65,21 +67,18 @@ public class ImEntity extends MultiValueAttributeEntitySkeleton implements Child
         this.user = user;
     }
 
-    public MultiValuedAttribute toScim() {
-        return new MultiValuedAttribute.Builder().
+    public Ims toScim() {
+        return new Ims.Builder().
                 setType(getType()).
                 setValue(getValue()).
                 build();
     }
 
-    public static ImEntity fromScim(MultiValuedAttribute multiValuedAttribute) {
+    public static ImEntity fromScim(Ims entitlement) {
         ImEntity imEntity = new ImEntity();
-        imEntity.setType(multiValuedAttribute.getType());
-        imEntity.setValue(String.valueOf(multiValuedAttribute.getValue()));
+        imEntity.setType(entitlement.getType());
+        imEntity.setValue(String.valueOf(entitlement.getValue()));
         return imEntity;
     }
 
-    public enum CanonicalImTypes {
-        aim, gtalk, icq, xmpp, msn, skype, qq, yahoo
-    }
 }

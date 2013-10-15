@@ -13,10 +13,23 @@ import org.osiam.storage.entities.RolesEntity
 import org.osiam.storage.entities.UserEntity
 import org.osiam.storage.entities.X509CertificateEntity
 import org.osiam.resources.scim.Address
+import org.osiam.resources.scim.Email;
+import org.osiam.resources.scim.Entitlement;
+import org.osiam.resources.scim.GroupRef;
+import org.osiam.resources.scim.Ims;
 import org.osiam.resources.scim.Meta
-import org.osiam.resources.scim.MultiValuedAttribute
 import org.osiam.resources.scim.Name
+import org.osiam.resources.scim.PhoneNumber;
+import org.osiam.resources.scim.Photo;
+import org.osiam.resources.scim.Role;
 import org.osiam.resources.scim.User
+import org.osiam.resources.scim.X509Certificate;
+import org.osiam.resources.type.EmailType;
+import org.osiam.resources.type.EntitlementType
+import org.osiam.resources.type.ImsType;
+import org.osiam.resources.type.PhoneNumberType;
+import org.osiam.resources.type.PhotoType;
+
 import spock.lang.Specification
 
 
@@ -31,28 +44,26 @@ class UserPatchTest extends Specification {
         userDao.update(_) >> entity
     }
 
-
-
     def "should delete single attribute of a multi-value-attribute list"() {
         def emails = new ArrayList()
-        emails.add(new MultiValuedAttribute.Builder().setValue("email").setOperation("delete").build())
+        emails.add(new Email.Builder().setValue("email").setOperation("delete").build())
 
         def entitlements = new ArrayList()
-        entitlements.add(new MultiValuedAttribute.Builder().setValue("entitlement").setOperation("delete").build())
+        entitlements.add(new Entitlement.Builder().setValue("entitlement").setOperation("delete").build())
 
         def ims = new ArrayList()
-        ims.add(new MultiValuedAttribute.Builder().setValue("im").setOperation("delete").build())
+        ims.add(new Ims.Builder().setValue("im").setOperation("delete").build())
 
         def numbers = new ArrayList()
-        numbers.add(new MultiValuedAttribute.Builder().setValue("phonenumber").setOperation("delete").build())
+        numbers.add(new PhoneNumber.Builder().setValue("phonenumber").setOperation("delete").build())
 
         def photos = new ArrayList()
-        photos.add(new MultiValuedAttribute.Builder().setValue("photo.png").setOperation("delete").build())
+        photos.add(new Photo.Builder().setValue("photo.png").setOperation("delete").build())
 
         def roles = new ArrayList()
-        roles.add(new MultiValuedAttribute.Builder().setValue("role").setOperation("delete").build())
+        roles.add(new Role.Builder().setValue("role").setOperation("delete").build())
         def certificates = new ArrayList()
-        certificates.add(new MultiValuedAttribute.Builder().setValue("x509").setOperation("delete").build())
+        certificates.add(new X509Certificate.Builder().setValue("x509").setOperation("delete").build())
         def user = new User.Builder("test").setActive(true)
                 .setEmails(emails)
                 .setEntitlements(entitlements)
@@ -65,7 +76,7 @@ class UserPatchTest extends Specification {
 
 
         addListsToEntity(entity)
-        entity.getEmails().add(new EmailEntity(value: "email2", type: "work", primary: false))
+        entity.getEmails().add(new EmailEntity(value: "email2", type: "WORK", primary: false))
 
         when:
         bean.update(id, user)
@@ -84,21 +95,19 @@ class UserPatchTest extends Specification {
     private void addListsToEntity(UserEntity entity) {
         entity.getX509Certificates().add(new X509CertificateEntity(value: "x509"))
         entity.getAddresses().add(new AddressEntity())
-        entity.getEmails().add(new EmailEntity(value: "email", type: "work", primary: false))
+        entity.getEmails().add(new EmailEntity(value: "email", type: "WORK", primary: false))
         entity.getEntitlements().add(new EntitlementsEntity(value: "entitlement"))
-        entity.getIms().add(new ImEntity(value: "im", type: "icq"))
-        entity.getPhoneNumbers().add(new PhoneNumberEntity(value: "phonenumber", type: "work"))
-        entity.getPhotos().add(new PhotoEntity(value: "photo.png", type: "photo"))
+        entity.getIms().add(new ImEntity(value: "im", type: "ICQ"))
+        entity.getPhoneNumbers().add(new PhoneNumberEntity(value: "phonenumber", type: "WORK"))
+        entity.getPhotos().add(new PhotoEntity(value: "photo.png", type: "PHOTO"))
         entity.getRoles().add(new RolesEntity(value: "role"))
     }
-
 
     def "should delete all attributes of a multi-value-attribute list"() {
         def meta = new Meta.Builder(null, null).setAttributes(["addresses", "emails", "entitlements", "ims", "phonenumbers", "photos", "roles", "X509Certificates"] as Set).build()
         def user = new User.Builder("test").setActive(true)
                 .setMeta(meta)
                 .build()
-
 
         addListsToEntity(entity)
         when:
@@ -115,27 +124,26 @@ class UserPatchTest extends Specification {
         entity.getRoles().empty
     }
 
-
     def "should replace attributes of a multi-value-attribute list"() {
         def emails = new ArrayList()
-        emails.add(new MultiValuedAttribute.Builder().setValue("email").setPrimary(true).setType("home").build())
+        emails.add(new Email.Builder().setValue("email").setPrimary(true).setType(EmailType.HOME).build())
 
         def entitlements = new ArrayList()
-        entitlements.add(new MultiValuedAttribute.Builder().setValue("entitlement").setPrimary(true).setType("home").build())
+        entitlements.add(new Entitlement.Builder().setValue("entitlement").setPrimary(true).setType(new EntitlementType("home")).build())
 
         def ims = new ArrayList()
-        ims.add(new MultiValuedAttribute.Builder().setValue("im").setPrimary(true).setType("icq").build())
+        ims.add(new Ims.Builder().setValue("im").setPrimary(true).setType(ImsType.ICQ).build())
 
         def numbers = new ArrayList()
-        numbers.add(new MultiValuedAttribute.Builder().setValue("phonenumber").setPrimary(true).setType("home").build())
+        numbers.add(new PhoneNumber.Builder().setValue("phonenumber").setPrimary(true).setType(PhoneNumberType.HOME).build())
 
         def photos = new ArrayList()
-        photos.add(new MultiValuedAttribute.Builder().setValue("photo.png").setPrimary(true).setType("photo").build())
+        photos.add(new Photo.Builder().setValue("photo.png").setPrimary(true).setType(PhotoType.PHOTO).build())
 
         def roles = new ArrayList()
-        roles.add(new MultiValuedAttribute.Builder().setValue("role").setPrimary(true).setType("home").build())
+        roles.add(new Role.Builder().setValue("role").setPrimary(true).build())
         def certificates = new ArrayList()
-        certificates.add(new MultiValuedAttribute.Builder().setValue("x509").setPrimary(true).setType("home").build())
+        certificates.add(new X509Certificate.Builder().setValue("x509").setPrimary(true).build())
         def user = new User.Builder("test").setActive(true)
                 .setEmails(emails)
                 .setEntitlements(entitlements)
@@ -146,9 +154,8 @@ class UserPatchTest extends Specification {
                 .setX509Certificates(certificates)
                 .build()
 
-
         addListsToEntity(entity)
-        entity.getEmails().add(new EmailEntity(value: "email2", type: "work", primary: false))
+        entity.getEmails().add(new EmailEntity(value: "email2", type: "WORK", primary: false))
 
         when:
         bean.update(id, user)
@@ -161,31 +168,30 @@ class UserPatchTest extends Specification {
         for (EmailEntity e : entity.getEmails()) {
             if (e.getValue() == "email") {
                 e.primary == true
-                e.type == "home"
+                e.type == EmailType.HOME
             } else {
                 e.primary == false
-                e.type == "work"
+                e.type == EmailType.WORK
             }
         }
         entity.getEntitlements().size() == 1
         entity.getIms().size() == 1
-        entity.getIms().first().type == "icq"
+        entity.getIms().first().type == ImsType.ICQ
         entity.getPhoneNumbers().size() == 1
-        entity.getPhoneNumbers().first().type == "home"
+        entity.getPhoneNumbers().first().type == PhoneNumberType.HOME
         entity.getPhotos().size() == 1
-        entity.getPhotos().first().type == "photo"
+        entity.getPhotos().first().type == PhotoType.PHOTO
 
         entity.getRoles().size() == 1
     }
 
     def "should delete and add a value to a multi-value-attribute list"() {
         def emails = new ArrayList()
-        emails.add(new MultiValuedAttribute.Builder().setValue("email").setOperation("delete").build())
-        emails.add(new MultiValuedAttribute.Builder().setValue("email2").setType("work").build())
+        emails.add(new Email.Builder().setValue("email").setOperation("delete").build())
+        emails.add(new Email.Builder().setValue("email2").setType(EmailType.WORK).build())
         def user = new User.Builder("test").setActive(true)
                 .setEmails(emails)
                 .build()
-
 
         addListsToEntity(entity)
 
@@ -195,9 +201,7 @@ class UserPatchTest extends Specification {
         1 * userDao.getById(id) >> entity
         entity.getEmails().size() == 1
         entity.getEmails().first().value == "email2"
-
     }
-
 
     def "should replace a non Sub-Attribute able attribute of an user (e.q. addresses)"() {
         def addresses = new ArrayList()
@@ -208,8 +212,8 @@ class UserPatchTest extends Specification {
                 .build()
 
 
-        entity.addresses.add(new AddressEntity(type: "work"))
-        entity.addresses.add(new AddressEntity(type: "home"))
+        entity.addresses.add(new AddressEntity(type: "WORK"))
+        entity.addresses.add(new AddressEntity(type: "HOME"))
         addListsToEntity(entity)
 
         when:
@@ -382,7 +386,7 @@ class UserPatchTest extends Specification {
     def "should ignore read-only attributes on modify"() {
         given:
         def user = new User.Builder().setGroups(new ArrayList()).build()
-        user.getGroups().add(new MultiValuedAttribute.Builder().build())
+        user.getGroups().add(new GroupRef.Builder().build())
 
         entity.setUserName("username")
 

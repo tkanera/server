@@ -23,13 +23,19 @@
 
 package org.osiam.storage.entities;
 
-import org.osiam.resources.scim.Group;
-import org.osiam.resources.scim.MultiValuedAttribute;
-
-import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.OneToMany;
+
+import org.osiam.resources.scim.Group;
+import org.osiam.resources.scim.GroupRef;
+import org.osiam.resources.scim.Member;
 
 /**
  * Group Entity
@@ -48,7 +54,7 @@ public class GroupEntity extends InternalIdSkeleton {
     public GroupEntity() {
         getMeta().setResourceType("Group");
     }
-
+    
     public static GroupEntity fromScim(Group group) {
         GroupEntity groupEntity = new GroupEntity();
         groupEntity.setDisplayName(group.getDisplayName());
@@ -66,8 +72,8 @@ public class GroupEntity extends InternalIdSkeleton {
     }
 
     private static void transferMultiValueAttributeToInternalIdSkeleton(Group group, Set<InternalIdSkeleton> result) {
-        for (final MultiValuedAttribute m : group.getMembers()) {
-            InternalIdSkeleton skeleton = new InternalIdSkeletonToMultivalueAttribute(m.getDisplay(), UUID.fromString(String.valueOf(m.getValue())));
+        for (final Member actMember : group.getMembers()) {
+            InternalIdSkeleton skeleton = new InternalIdSkeletonToMultivalueAttribute(actMember.getDisplay(), UUID.fromString(String.valueOf(actMember.getValue())));
             result.add(skeleton);
         }
     }
@@ -110,15 +116,20 @@ public class GroupEntity extends InternalIdSkeleton {
 
     @Override
     public Group toScim() {
-        return new Group.Builder().setDisplayName(getDisplayName()).setMembers(membersToScim())
+        return new Group.Builder(getDisplayName()).setMembers(membersToScim())
                 .setExternalId(getExternalId()).setId(getId().toString()).setMeta(getMeta().toScim()).build();
     }
+    
+    public GroupRef toGroupRefScim() {
+        return new GroupRef.Builder().setValue(getId().toString()).setDisplay(getDisplayName()).build();
+    }
 
-    private Set<MultiValuedAttribute> membersToScim() {
-        Set<MultiValuedAttribute> members1 = new HashSet<>();
-        for (InternalIdSkeleton i : members) {
+    private Set<Member> membersToScim() {
+        Set<Member> members1 = new HashSet<>();
+        for (InternalIdSkeleton actInternalSkeleton : members) {
             members1.add(
-                    new MultiValuedAttribute.Builder().setValue(i.getId().toString()).setDisplay(i.getDisplayName())
+                    new Member.Builder().setValue(actInternalSkeleton.getId().toString())
+                    					.setDisplay(actInternalSkeleton.getDisplayName())
                             .build());
         }
         return members1;

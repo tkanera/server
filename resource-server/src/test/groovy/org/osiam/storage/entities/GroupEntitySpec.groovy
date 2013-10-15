@@ -24,10 +24,10 @@
 package org.osiam.storage.entities
 
 import org.osiam.resources.scim.Group
-import org.osiam.resources.scim.MultiValuedAttribute
-import org.osiam.storage.entities.GroupEntity
-import org.osiam.storage.entities.InternalIdSkeleton
-import spock.lang.Specification
+import org.osiam.resources.scim.GroupRef;
+import org.osiam.resources.scim.Member;
+
+import spock.lang.Specification;
 
 /**
  * Created with IntelliJ IDEA.
@@ -82,12 +82,12 @@ class GroupEntitySpec extends Specification {
 
     def "mapping from scim should be present"() {
         def members = new HashSet()
-        members.add(new MultiValuedAttribute.Builder().
+        members.add(new Member.Builder().
                 setValue(UUID.randomUUID().toString()).
                 setDisplay("display").
                 build())
         given:
-        def group = new Group.Builder().setDisplayName("displayname").setMembers(members).
+        def group = new Group.Builder("displayname").setMembers(members).
                 setId(UUID.randomUUID().toString()).build()
         when:
         def result = GroupEntity.fromScim(group)
@@ -98,12 +98,12 @@ class GroupEntitySpec extends Specification {
 
     def "members from scim should return null when toscim"() {
         def members = new HashSet()
-        members.add(new MultiValuedAttribute.Builder().
+        members.add(new Member.Builder().
                 setValue(UUID.randomUUID().toString()).
                 setDisplay("display").
                 build())
         given:
-        def group = new Group.Builder().setDisplayName("displayname").setMembers(members).setId(UUID.randomUUID().toString()).build()
+        def group = new Group.Builder("displayname").setMembers(members).setId(UUID.randomUUID().toString()).build()
         when:
         def result = GroupEntity.fromScim(group)
         then:

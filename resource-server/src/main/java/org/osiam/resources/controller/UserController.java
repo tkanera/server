@@ -27,6 +27,7 @@ import org.osiam.resources.helper.AttributesRemovalHelper;
 import org.osiam.resources.helper.JsonInputValidator;
 import org.osiam.resources.helper.RequestParamHelper;
 import org.osiam.resources.provisioning.SCIMUserProvisioning;
+import org.osiam.resources.scim.Meta;
 import org.osiam.resources.scim.SCIMSearchResult;
 import org.osiam.resources.scim.User;
 import org.springframework.http.HttpStatus;
@@ -76,7 +77,7 @@ public class  UserController {
     public User getUser(@PathVariable final String id) {
         User user = scimUserProvisioning.getById(id);
         //clone without password
-        return User.Builder.generateForOutput(user);
+        return User.Builder.copyUserWithoutPassword(user).build();
     }
 
     @RequestMapping(method = RequestMethod.POST)
@@ -88,8 +89,8 @@ public class  UserController {
         String requestUrl = request.getRequestURL().toString();
         URI uri = new UriTemplate("{requestUrl}{internalId}").expand(requestUrl + "/", createdUser.getId());
         response.setHeader("Location", uri.toASCIIString());
-        createdUser.getMeta().setLocation(uri.toASCIIString());
-        return User.Builder.generateForOutput(createdUser);
+        Meta newMeta = new Meta.Builder(createdUser.getMeta()).setLocation(uri.toASCIIString()).build();
+        return User.Builder.copyUserWithoutPassword(createdUser).setMeta(newMeta).build();
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT) // NOSONAR - duplicate literals unnecessary
@@ -140,7 +141,7 @@ public class  UserController {
                                                       User createdUser) {
         String requestUrl = request.getRequestURL().toString();
         response.setHeader("Location", requestUrl);
-        createdUser.getMeta().setLocation(requestUrl);
-        return User.Builder.generateForOutput(createdUser);
+        Meta newMeta = new Meta.Builder(createdUser.getMeta()).setLocation(requestUrl).build();
+        return User.Builder.copyUserWithoutPassword(createdUser).setMeta(newMeta).build();
     }
 }

@@ -23,8 +23,8 @@
 
 package org.osiam.storage.entities
 
-import org.osiam.resources.scim.MultiValuedAttribute
-import org.osiam.storage.entities.EntitlementsEntity
+import org.osiam.resources.scim.Entitlement;
+
 import spock.lang.Specification
 
 /**
@@ -56,7 +56,7 @@ class EntitlementsEntitySpec extends Specification {
 
     def "mapping from scim should be present"() {
         given:
-        MultiValuedAttribute multiValuedAttribute = new MultiValuedAttribute.Builder().
+        Entitlement multiValuedAttribute = new Entitlement.Builder().
                 setValue("value").
                 build()
 

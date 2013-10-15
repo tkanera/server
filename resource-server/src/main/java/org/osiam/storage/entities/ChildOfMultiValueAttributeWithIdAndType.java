@@ -23,21 +23,23 @@
 
 package org.osiam.storage.entities;
 
+import org.osiam.resources.type.GenericType;
+
 /**
  * Means that an Entity is expressed by an MultiValuedAttribute in SCIM and has also a type.
  */
-public interface ChildOfMultiValueAttributeWithIdAndType extends ChildOfMultiValueAttributeWithId {
+public interface ChildOfMultiValueAttributeWithIdAndType<E extends GenericType<E>> extends ChildOfMultiValueAttributeWithId {
     /**
      * The type of a multi value attribute (e.q. home, work)
      *
      * @return String containing the value of the type or null if not set
      */
-    String getType();
+    GenericType<E> getType();
 
     /**
      * Sets the type of a multi value attribute (e.q. home, work)
      */
-    void setType(String type);
+    void setType(E type);
 
 
 }

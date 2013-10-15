@@ -15,7 +15,7 @@ public class TypeErrorMessageTransformer implements ErrorMessageTransformer {
     // group 3 = the name of the inner enum so that we can combine it to group1+$+group3 (to find the class of the enum)
     // group 4 = the wrong value send by the client
     private static Pattern pattern =
-            Pattern.compile("No enum constant (org\\.osiam\\.storage\\.entities\\.(\\w+)Entity)\\.(\\w+).(\\w+)");
+            Pattern.compile("No enum constant (org\\.osiam\\.resources\\.type\\.(\\w+)Type).(\\w+)");
 
     @Override
     public String transform(String message) {

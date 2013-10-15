@@ -25,25 +25,30 @@ package org.osiam.resources.controller
 
 import org.osiam.resources.helper.AttributesRemovalHelper
 import org.osiam.resources.helper.JsonInputValidator
-import org.osiam.resources.helper.RequestParamHelper
 import org.osiam.resources.provisioning.SCIMUserProvisioning
+import org.osiam.resources.helper.RequestParamHelper
+import org.osiam.resources.scim.SCIMSearchResult
+import org.springframework.http.HttpStatus
+import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
+import org.springframework.security.oauth2.provider.token.InMemoryTokenStore;
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestMethod
+import org.springframework.web.bind.annotation.ResponseBody
+import org.springframework.web.bind.annotation.ResponseStatus
 import org.osiam.resources.scim.Meta
 import org.osiam.resources.scim.Name
-import org.osiam.resources.scim.SCIMSearchResult
 import org.osiam.resources.scim.User
 import org.osiam.storage.entities.EmailEntity
 import org.osiam.storage.entities.MetaEntity
 import org.osiam.storage.entities.NameEntity
 import org.osiam.storage.entities.UserEntity
-import org.springframework.http.HttpStatus
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestMethod
-import org.springframework.web.bind.annotation.ResponseBody
-import org.springframework.web.bind.annotation.ResponseStatus
+
 import spock.lang.Specification
 
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
+
 import java.lang.reflect.Method
 
 class UserControllerTest extends Specification {
@@ -72,7 +77,7 @@ class UserControllerTest extends Specification {
             .setId("id")
             .setMeta(new Meta.Builder().build())
             .build()
-    
+  
     NameEntity nameEntity = new NameEntity(familyName: "Prefect", givenName: "Fnord", formatted: "Fnord Prefect")
     UserEntity userEntity = new UserEntity(active: true, emails: [new EmailEntity(primary: true, value: "test@test.de")],
 	    name: nameEntity, id: UUID.randomUUID(), meta: new MetaEntity(GregorianCalendar.getInstance()),
@@ -162,8 +167,6 @@ class UserControllerTest extends Specification {
         defaultStatus.value() == HttpStatus.OK
     }
 
-
-
     def validateUser(User result) {
         assert result != user
         assert user.password != null
@@ -190,7 +193,7 @@ class UserControllerTest extends Specification {
         assert result.userName == user.userName
         assert result.id == user.id
         assert result.externalId == user.externalId
-        assert result.meta == user.meta
+        assert result.meta.equals(user.meta)
         true
     }
 
@@ -215,7 +218,7 @@ class UserControllerTest extends Specification {
         jsonInputValidator.validateJsonUser(httpServletRequest) >> user
 
         when:
-        def result = underTest.replace(id, httpServletRequest, httpServletResponse)
+        User result = underTest.replace(id, httpServletRequest, httpServletResponse)
 
         then:
         1 * provisioning.replace(id, user) >> user

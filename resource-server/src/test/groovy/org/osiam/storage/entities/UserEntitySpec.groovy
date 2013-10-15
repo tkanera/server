@@ -23,12 +23,23 @@
 
 package org.osiam.storage.entities
 
-import org.springframework.security.core.userdetails.UserDetails
 import org.osiam.resources.scim.Address
-import org.osiam.resources.scim.MultiValuedAttribute
+import org.osiam.resources.scim.Email;
+import org.osiam.resources.scim.Entitlement;
+import org.osiam.resources.scim.GroupRef;
+import org.osiam.resources.scim.Ims;
 import org.osiam.resources.scim.Name
+import org.osiam.resources.scim.PhoneNumber;
+import org.osiam.resources.scim.Photo;
+import org.osiam.resources.scim.Role;
 import org.osiam.resources.scim.User
-import spock.lang.Specification
+import org.osiam.resources.scim.X509Certificate;
+import org.osiam.resources.type.EmailType;
+import org.osiam.resources.type.ImsType;
+import org.osiam.resources.type.PhoneNumberType;
+import org.osiam.resources.type.PhotoType;
+
+import spock.lang.Specification;
 
 /**
  * Created with IntelliJ IDEA.
@@ -79,44 +90,44 @@ class UserEntitySpec extends Specification {
                 setLocality("locality").
                 setPostalCode("123456").
                 setRegion("region").
-                setStreetAddress("streetAddress").setPrimary(true).
+                setStreetAddress("streetAddress").
                 build())
 
-        emails.add(new MultiValuedAttribute.Builder().
+        emails.add(new Email.Builder().
                 setPrimary(true).
-                setType("home").
+                setType(EmailType.HOME).
                 setValue("value").
                 build())
 
-        entitlements.add(new MultiValuedAttribute.Builder().
+        entitlements.add(new Entitlement.Builder().
                 setValue("value").
                 build())
 
-        groups.add(new MultiValuedAttribute.Builder().
+        groups.add(new GroupRef.Builder().
                 setValue(UUID.randomUUID().toString()).
                 setDisplay("display").
                 build())
 
-        ims.add(new MultiValuedAttribute.Builder().
+        ims.add(new Ims.Builder().
                 setValue("blaaaa").
-                setType("icq").
+                setType(ImsType.ICQ).
                 build())
 
-        phoneNumbers.add(new MultiValuedAttribute.Builder().
+        phoneNumbers.add(new PhoneNumber.Builder().
                 setValue("blaaaa").
-                setType("home").
+                setType(PhoneNumberType.HOME).
                 build())
 
-        photos.add(new MultiValuedAttribute.Builder().
+        photos.add(new Photo.Builder().
                 setValue("picture.gif").
-                setType("photo").
+                setType(PhotoType.PHOTO).
                 build())
 
-        roles.add(new MultiValuedAttribute.Builder().
+        roles.add(new Role.Builder().
                 setValue("blaaaa").
                 build())
 
-        certificates.add(new MultiValuedAttribute.Builder().
+        certificates.add(new X509Certificate.Builder().
                 setValue("blaaaa").
                 build())
     }

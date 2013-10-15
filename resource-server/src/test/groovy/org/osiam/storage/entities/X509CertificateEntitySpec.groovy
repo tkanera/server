@@ -23,9 +23,8 @@
 
 package org.osiam.storage.entities
 
-import org.osiam.resources.scim.MultiValuedAttribute
-import org.osiam.storage.entities.UserEntity
-import org.osiam.storage.entities.X509CertificateEntity
+import org.osiam.resources.scim.X509Certificate;
+
 import spock.lang.Specification
 
 /**
@@ -66,7 +65,7 @@ class X509CertificateEntitySpec extends Specification {
 
     def "mapping from scim should be present"() {
         given:
-        MultiValuedAttribute multiValuedAttribute = new MultiValuedAttribute.Builder().
+        X509Certificate multiValuedAttribute = new X509Certificate.Builder().
                 setValue("blaaaa").
                 build()
 

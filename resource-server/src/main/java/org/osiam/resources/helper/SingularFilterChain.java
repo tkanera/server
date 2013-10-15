@@ -22,6 +22,10 @@ import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
 import org.joda.time.DateTime;
 import org.joda.time.format.ISODateTimeFormat;
+import org.osiam.resources.type.EmailType;
+import org.osiam.resources.type.ImsType;
+import org.osiam.resources.type.PhoneNumberType;
+import org.osiam.resources.type.PhotoType;
 import org.osiam.storage.entities.EmailEntity;
 import org.osiam.storage.entities.ImEntity;
 import org.osiam.storage.entities.PhoneNumberEntity;
@@ -91,15 +95,15 @@ public class SingularFilterChain implements FilterChain {
             String keyname =  splitKeys.get(1);
             switch (className + keyname) {
                 case "EmailEntity" + KEYNAME_TYPE:
-                    return EmailEntity.CanonicalEmailTypes.valueOf(group);
+                    return EmailType.fromString(group);
                 case "EmailEntity" + KEYNAME_PRIMARY:
                     return getBoolean(group);
                 case "PhotoEntity" + KEYNAME_TYPE:
-                    return PhotoEntity.CanonicalPhotoTypes.valueOf(group);
+                    return PhotoType.fromString(group);
                 case "ImEntity" + KEYNAME_TYPE:
-                    return ImEntity.CanonicalImTypes.valueOf(group);
+                    return ImsType.fromString(group);
                 case "PhoneNumberEntity" + KEYNAME_TYPE:
-                    return PhoneNumberEntity.CanonicalPhoneNumberTypes.valueOf(group);
+                    return PhoneNumberType.fromString(group);
                 case "AddressEntity" + KEYNAME_PRIMARY:
                     return getBoolean(group);
             }

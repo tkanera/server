@@ -1,17 +1,17 @@
 package org.osiam.resources.provisioning
 
-import org.osiam.storage.dao.GroupDAO
-import org.osiam.resources.provisioning.SCIMGroupProvisioningBean
-import org.osiam.storage.entities.GroupEntity
-import org.osiam.resources.exceptions.ResourceExistsException
-import org.osiam.resources.exceptions.ResourceNotFoundException
-import org.springframework.dao.DataIntegrityViolationException
-import org.osiam.resources.scim.Group
-import org.osiam.resources.scim.MultiValuedAttribute
-import spock.lang.Specification
-
 import javax.persistence.EntityManager
 import javax.persistence.Query
+
+import org.osiam.resources.exceptions.ResourceExistsException
+import org.osiam.resources.exceptions.ResourceNotFoundException
+import org.osiam.resources.scim.Group
+import org.osiam.resources.scim.Member
+import org.osiam.storage.dao.GroupDAO
+import org.osiam.storage.entities.GroupEntity
+import org.springframework.dao.DataIntegrityViolationException
+
+import spock.lang.Specification
 
 class GroupCreateTest extends Specification {
     EntityManager em = Mock(EntityManager)
@@ -26,7 +26,7 @@ class GroupCreateTest extends Specification {
         def internalId = UUID.randomUUID()
         def query = Mock(Query)
         def queryResults = []
-        members.add(new MultiValuedAttribute.Builder().setValue(internalId.toString()).build())
+        members.add(new Member.Builder().setValue(internalId.toString()).build())
         def group = new Group.Builder().setMembers(members).build()
         when:
         underTest.create(group)
@@ -39,13 +39,12 @@ class GroupCreateTest extends Specification {
 
     }
 
-
     def "should abort when a group already exists"() {
         given:
         def internalId = UUID.randomUUID()
         def query = Mock(Query)
-        members.add(new MultiValuedAttribute.Builder().setValue(internalId.toString()).build())
-        def group = new Group.Builder().setDisplayName("displayName").setMembers(members).build()
+        members.add(new Member.Builder().setValue(internalId.toString()).build())
+        def group = new Group.Builder("displayName").setMembers(members).build()
         when:
         underTest.create(group)
         then:
@@ -61,7 +60,7 @@ class GroupCreateTest extends Specification {
         given:
         def internalId = UUID.randomUUID()
         def query = Mock(Query)
-        members.add(new MultiValuedAttribute.Builder().setValue(internalId.toString()).build())
+        members.add(new Member.Builder().setValue(internalId.toString()).build())
         def group = new Group.Builder().setMembers(members).build()
         def queryResults = [GroupEntity.fromScim(group)]
         when:

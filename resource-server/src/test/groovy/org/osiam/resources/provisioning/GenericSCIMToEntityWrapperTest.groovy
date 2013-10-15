@@ -23,6 +23,16 @@
 
 package org.osiam.resources.provisioning
 
+import org.osiam.resources.scim.Email
+import org.osiam.resources.scim.Entitlement
+import org.osiam.resources.scim.Ims
+import org.osiam.resources.scim.Meta
+import org.osiam.resources.scim.Name
+import org.osiam.resources.scim.PhoneNumber
+import org.osiam.resources.scim.Photo
+import org.osiam.resources.scim.Role
+import org.osiam.resources.scim.User
+import org.osiam.resources.scim.X509Certificate
 import org.osiam.storage.entities.AddressEntity
 import org.osiam.storage.entities.EmailEntity
 import org.osiam.storage.entities.EntitlementsEntity
@@ -33,10 +43,7 @@ import org.osiam.storage.entities.PhotoEntity
 import org.osiam.storage.entities.RolesEntity
 import org.osiam.storage.entities.UserEntity
 import org.osiam.storage.entities.X509CertificateEntity
-import org.osiam.resources.scim.Meta
-import org.osiam.resources.scim.MultiValuedAttribute
-import org.osiam.resources.scim.Name
-import org.osiam.resources.scim.User
+
 import spock.lang.Specification
 
 class FakeSCIMEntities implements SCIMEntities {
@@ -165,23 +172,23 @@ class GenericSCIMToEntityWrapperTest extends Specification {
         def user = new User.Builder("test").setActive(true)
                 .build()
 
-        user.emails.add(new MultiValuedAttribute.Builder().setValue("email").setOperation("delete").build())
+        user.emails.add(new Email.Builder().setValue("email").setOperation("delete").build())
 
-        user.entitlements.add(new MultiValuedAttribute.Builder().setValue("entitlement").setOperation("delete").build())
+        user.entitlements.add(new Entitlement.Builder().setValue("entitlement").setOperation("delete").build())
 
-        user.ims.add(new MultiValuedAttribute.Builder().setValue("im").setOperation("delete").build())
+        user.ims.add(new Ims.Builder().setValue("im").setOperation("delete").build())
 
-        user.phoneNumbers.add(new MultiValuedAttribute.Builder().setValue("phonenumber").setOperation("delete").build())
+        user.phoneNumbers.add(new PhoneNumber.Builder().setValue("phonenumber").setOperation("delete").build())
 
-        user.photos.add(new MultiValuedAttribute.Builder().setValue("photo.png").setOperation("delete").build())
+        user.photos.add(new Photo.Builder().setValue("photo.png").setOperation("delete").build())
 
-        user.roles.add(new MultiValuedAttribute.Builder().setValue("role").setOperation("delete").build())
-        user.x509Certificates.add(new MultiValuedAttribute.Builder().setValue("x509").setOperation("delete").build())
+        user.roles.add(new Role.Builder().setValue("role").setOperation("delete").build())
+        user.x509Certificates.add(new X509Certificate.Builder().setValue("x509").setOperation("delete").build())
 
 
         def entity = createEntityWithInternalId()
         addListsToEntity(entity)
-        entity.getEmails().add(new EmailEntity(value: "email2", type: "work", primary: false))
+        entity.getEmails().add(new EmailEntity(value: "email2", type: "WORK", primary: false))
         def underTest = new GenericSCIMToEntityWrapper(userTarget, user, entity, GenericSCIMToEntityWrapper.Mode.PATCH, FakeSCIMEntities.ENTITIES)
 
         when:
@@ -200,11 +207,11 @@ class GenericSCIMToEntityWrapperTest extends Specification {
     static addListsToEntity(UserEntity entity) {
         entity.getX509Certificates().add(new X509CertificateEntity(value: "x509"))
         entity.getAddresses().add(new AddressEntity())
-        entity.getEmails().add(new EmailEntity(value: "email", type: "work", primary: false))
+        entity.getEmails().add(new EmailEntity(value: "email", type: "WORK", primary: false))
         entity.getEntitlements().add(new EntitlementsEntity(value: "entitlement"))
-        entity.getIms().add(new ImEntity(value: "im", type: "icq"))
-        entity.getPhoneNumbers().add(new PhoneNumberEntity(value: "phonenumber", type: "work"))
-        entity.getPhotos().add(new PhotoEntity(value: "photo.png", type: "photo"))
+        entity.getIms().add(new ImEntity(value: "im", type: "ICQ"))
+        entity.getPhoneNumbers().add(new PhoneNumberEntity(value: "phonenumber", type: "WORK"))
+        entity.getPhotos().add(new PhotoEntity(value: "photo.png", type: "PHOTO"))
         entity.getRoles().add(new RolesEntity(value: "role"))
     }
 
