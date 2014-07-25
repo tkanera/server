@@ -23,6 +23,8 @@
 
 package org.osiam.security.controller;
 
+import java.util.Collection;
+
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 
@@ -81,9 +83,24 @@ public class TokenController {
     
     @RequestMapping(value = "/revocation", method = RequestMethod.POST)
     @ResponseBody
-    public void tokenRevokation(@RequestHeader("Authorization") final String authorization) {
+    public void tokenRevocation(@RequestHeader("Authorization") final String authorization) {
         String token = getToken(authorization);
         tokenServices.revokeToken(token);
+    }
+    
+    /**
+     * Revokes all tokens of the given user.
+     * 
+     * @param userName the user name
+     */
+    @RequestMapping(value = "/revocation", method = RequestMethod.POST)
+    public void tokenRevocationByName(final String userName) {
+        Collection<OAuth2AccessToken> tokens = tokenServices.findTokensByUserName(userName);
+        if (tokens != null) {
+            for (OAuth2AccessToken token: tokens) {
+                tokenServices.revokeToken(token.getValue());
+            }
+        }
     }
 
     @ExceptionHandler

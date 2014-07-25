@@ -29,6 +29,7 @@ import org.osiam.client.oauth.AccessToken;
 import org.osiam.client.oauth.Scope;
 import org.osiam.resources.scim.User;
 import org.springframework.security.core.Authentication
+import org.springframework.security.oauth2.common.DefaultOAuth2AccessToken
 import org.springframework.security.oauth2.common.OAuth2AccessToken
 import org.springframework.security.oauth2.provider.AuthorizationRequest
 import org.springframework.security.oauth2.provider.OAuth2Authentication
@@ -75,9 +76,38 @@ class TokenControllerSpec extends Specification {
     
     def 'OSNG-444: A request to revoke a token should be delegated to the TokenService'() {
         when:
-        tokenController.tokenRevokation('prefix accessToken')
+        tokenController.tokenRevocation('prefix accessToken')
 
         then:
         1 * defaultTokenServicesMock.revokeToken('accessToken')
+    }
+    
+    def 'OSNG-467: A request to revoke tokens for a given user should revoke all tokens of the user'() {
+        given:
+        def userName = 'User Name'
+        OAuth2AccessToken token1 = new DefaultOAuth2AccessToken('token1')
+        OAuth2AccessToken token2 = new DefaultOAuth2AccessToken('token2')
+        OAuth2AccessToken token3 = new DefaultOAuth2AccessToken('token3')
+        
+        when:
+        tokenController.tokenRevocationByName(userName)
+        
+        then:
+        1 * defaultTokenServicesMock.findTokensByUserName(userName) >> [token1, token2, token3]
+        1 * defaultTokenServicesMock.revokeToken(token1.getValue())
+        1 * defaultTokenServicesMock.revokeToken(token2.getValue())
+        1 * defaultTokenServicesMock.revokeToken(token3.getValue())
+    }
+    
+    def "OSNG-467: A request to revoke tokens of a user that doesn't have any tokens shouldn't have any effect"() {
+        given:
+        def userName = 'User Name'
+        
+        when:
+        tokenController.tokenRevocationByName(userName)
+        
+        then:
+        1 * defaultTokenServicesMock.findTokensByUserName(userName)
+        0 * defaultTokenServicesMock.revokeToken(_)
     }
 }
